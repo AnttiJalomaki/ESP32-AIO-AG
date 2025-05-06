@@ -1,5 +1,5 @@
-#ifndef BUTTONS_H
-#define BUTTONS_H
+#ifndef HW_BUTTONS_H
+#define HW_BUTTONS_H
 
 #include "../../config/pinout.h"
 
@@ -19,4 +19,4 @@ private:
 
 } // namespace hw
 
-#endif // BUTTONS_H 
+#endif // HW_BUTTONS_H

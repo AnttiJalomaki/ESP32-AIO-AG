@@ -8,7 +8,9 @@
 #define GPS_RX_PIN 1
 #define GPS_TX_PIN 2
 
-#define STEER_BTN_PIN 12
+#define BUTTON_AUTOSTEER_PIN 12 // Renamed from STEER_BTN_PIN
+#define BUTTON_STEER_LEFT_PIN 0   // Added new definition (example pin, please verify)
+#define BUTTON_STEER_RIGHT_PIN 3  // Added new definition (example pin, please verify)
 #define WORK_BTN_PIN 13
 
 #define STEER_BTN_ACTIVE_STATE 1

@@ -1,38 +1,34 @@
 #include "settings.h"
-#include "../../autosteer/settings.h"
-#include "../../utils/log.h"
+#include <Arduino.h>
 #include <EEPROM.h>
+#include "../../autosteer/settings.h"
 
 namespace hw {
 
 bool Settings::initialized = false;
 
 bool Settings::init() {
-    if (initialized) return true;
-
-    // Initialize EEPROM
-    EEPROM.begin(512);
-
-    // Initialize the settings interface
-    settings::init({
-        .read = [](uint8_t address) { return Settings::read(address); },
-        .write = [](uint8_t value) { Settings::write(0, value); }  // Note: address is ignored in this simple implementation
-    });
-
+    if (initialized) {
+        return true;
+    }
+    EEPROM.begin(512); // Example size, adjust as needed
     initialized = true;
-    debugf("Settings initialized");
-    return true;
+    return initialized;
 }
 
 uint8_t Settings::read(uint8_t address) {
-    if (!initialized) init();
+    if (!initialized) {
+        init();
+    }
     return EEPROM.read(address);
 }
 
 void Settings::write(uint8_t address, uint8_t value) {
-    if (!initialized) init();
+    if (!initialized) {
+        init();
+    }
     EEPROM.write(address, value);
-    EEPROM.commit();
+    EEPROM.commit(); // Or EEPROM.end() depending on library version and usage
 }
 
-} // namespace hw 
+} // namespace hw

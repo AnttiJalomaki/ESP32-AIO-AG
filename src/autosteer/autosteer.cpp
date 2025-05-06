@@ -7,6 +7,7 @@
 #include "motor.h"
 #include "imu.h"
 #include "config/defines.h"
+#include "hardware/hardware.h"
 
 
 [[noreturn]] void autoSteerTask(void *pvParameters) {
@@ -54,7 +55,7 @@ void initAutosteer() {
   // Initialize all components
   bool success = true;
   
-  if (!buttons::init()) {   // Initialize button controls
+  if (!buttons::init(hw::ButtonsInterfaceImpl)) {   // Initialize button controls
     error("Failed to initialize buttons");
     success = false;
   }

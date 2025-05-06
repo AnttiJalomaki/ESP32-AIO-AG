@@ -1,44 +1,43 @@
 #include "buttons.h"
+#include <Arduino.h>
 #include "../../autosteer/buttons.h"
-#include "../../utils/log.h"
 
 namespace hw {
 
 bool Buttons::initialized = false;
 
 bool Buttons::init() {
-    if (initialized) return true;
+    if (initialized) {
+        return true;
+    }
 
-    // Configure button pins
-    pinMode(STEER_BTN_PIN, INPUT);
-    pinMode(STEER_LEFT_PIN, INPUT);
-    pinMode(STEER_RIGHT_PIN, INPUT);
-
-    // Initialize the buttons interface
-    buttons::init({
-        .isAutoSteerEnabled = Buttons::isAutoSteerEnabled,
-        .isSteerLeftPressed = Buttons::isSteerLeftPressed,
-        .isSteerRightPressed = Buttons::isSteerRightPressed
-    });
+    pinMode(BUTTON_AUTOSTEER_PIN, INPUT_PULLUP);
+    pinMode(BUTTON_STEER_LEFT_PIN, INPUT_PULLUP);
+    pinMode(BUTTON_STEER_RIGHT_PIN, INPUT_PULLUP);
 
     initialized = true;
-    debugf("Buttons initialized");
-    return true;
+    return initialized;
 }
 
 bool Buttons::isAutoSteerEnabled() {
-    if (!initialized) init();
-    return digitalRead(STEER_BTN_PIN) == HIGH;
+    if (!initialized) {
+        init();
+    }
+    return digitalRead(BUTTON_AUTOSTEER_PIN) == LOW;
 }
 
 bool Buttons::isSteerLeftPressed() {
-    if (!initialized) init();
-    return digitalRead(STEER_LEFT_PIN) == HIGH;
+    if (!initialized) {
+        init();
+    }
+    return digitalRead(BUTTON_STEER_LEFT_PIN) == LOW;
 }
 
 bool Buttons::isSteerRightPressed() {
-    if (!initialized) init();
-    return digitalRead(STEER_RIGHT_PIN) == HIGH;
+    if (!initialized) {
+        init();
+    }
+    return digitalRead(BUTTON_STEER_RIGHT_PIN) == LOW;
 }
 
-} // namespace hw 
+} // namespace hw

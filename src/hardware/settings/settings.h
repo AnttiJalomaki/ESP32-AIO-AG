@@ -1,6 +1,7 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
+#include <stdint.h>
 #include "../../config/pinout.h"
 
 namespace hw {
@@ -18,4 +19,4 @@ private:
 
 } // namespace hw
 
-#endif // SETTINGS_H 
+#endif // SETTINGS_H
