@@ -6,10 +6,12 @@
 #include "w6100/esp32_sc_w6100.h"
 
 // Ethernet configuration
+#if !USE_DHCP
 IPAddress staticIP(STATIC_IP_ADDR);
 IPAddress gateway(STATIC_GW_ADDR);
 IPAddress subnet(STATIC_SN_ADDR);
 IPAddress dns(STATIC_DNS_ADDR);
+#endif
 
 void getMacAddress(uint8_t* mac) {
     uint64_t chipmacid = ESP.getEfuseMac();
@@ -41,7 +43,9 @@ bool initializeEthernet() {
             delay(500);
         }
     } else {
+#if !USE_DHCP // This check is redundant due to the outer if/else but ensures staticIP, gateway, etc. are defined when USE_DHCP is false
         ETH.config(staticIP, gateway, subnet, dns);
+#endif
     }
 
     if (ETH.localIP() == INADDR_NONE) {

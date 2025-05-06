@@ -9,12 +9,12 @@
 
 #define GPSSerial Serial2
 
-#define STATIC_IP_ADDR {192, 168, 137, 2}
-#define STATIC_GW_ADDR {192, 168, 137, 1}
-#define STATIC_SN_ADDR {192, 168, 137, 255}
-#define STATIC_DNS_ADDR {8, 8, 8, 8}
+//#define STATIC_IP_ADDR {192, 168, 10, 20}
+//#define STATIC_GW_ADDR {192, 168, 10, 1}
+//#define STATIC_SN_ADDR {255, 255, 255, 0}
+//#define STATIC_DNS_ADDR {8, 8, 8, 8}
 
-#define USE_DHCP false
+#define USE_DHCP true
 
 #define GPS_DEFAULT_CONFIGURATION false
 
