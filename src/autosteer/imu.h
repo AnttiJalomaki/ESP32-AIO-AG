@@ -11,6 +11,7 @@ namespace imu {
     struct IMUInterface {
         ReadFunc heading = nullptr;
         ReadFunc roll = nullptr;
+        ReadFunc pitch = nullptr;
     };
 
     // Function declarations
@@ -18,6 +19,7 @@ namespace imu {
 
     float get_heading();
     float get_roll();
+    float get_pitch();
 }
 
 #endif //IMU_H

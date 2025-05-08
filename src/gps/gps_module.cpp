@@ -58,25 +58,45 @@ bool configureGPS() {
     resp = myGNSS.begin(GPSSerial, defaultMaxWait, false);
 
     if (GPS_DEFAULT_CONFIGURATION) {
-        //we could configure the gps module here. Not used for dual antenna setups and custom configurations
-        /*myGNSS.setNavigationFrequency(10);
+        if (resp) { // Only configure if initial begin was successful
+            debug("GPS - Applying default configuration...");
+            if (!myGNSS.setNavigationFrequency(10)) {
+                error("GPS - Failed to set navigation frequency.");
+                resp = false; // Update main resp
+            }
 
-        bool resp = myGNSS.setUART1Output(COM_TYPE_UBX | COM_TYPE_NMEA);  // Set the UART port to output NMEA
-        if (resp == false) {
-            error("GPS - Failed to set UART1 output.");
+            if (resp && !myGNSS.setUART1Output(COM_TYPE_UBX | COM_TYPE_NMEA)) {
+                error("GPS - Failed to set UART1 output (UBX/NMEA).");
+                resp = false; // Update main resp
+            }
+
+            if (resp) { // Only enable messages if previous steps succeeded
+                debug("GPS - Enabling NMEA messages...");
+                bool nmea_config_ok = true; // Use a local flag for this block of settings
+                nmea_config_ok &= myGNSS.enableNMEAMessage(UBX_NMEA_GGA, COM_PORT_UART1);
+                nmea_config_ok &= myGNSS.enableNMEAMessage(UBX_NMEA_GSA, COM_PORT_UART1);
+                nmea_config_ok &= myGNSS.enableNMEAMessage(UBX_NMEA_GSV, COM_PORT_UART1);
+                nmea_config_ok &= myGNSS.enableNMEAMessage(UBX_NMEA_RMC, COM_PORT_UART1);
+                nmea_config_ok &= myGNSS.enableNMEAMessage(UBX_NMEA_GST, COM_PORT_UART1); // Important for accuracy assessment
+                nmea_config_ok &= myGNSS.enableNMEAMessage(UBX_NMEA_VTG, COM_PORT_UART1);
+                nmea_config_ok &= myGNSS.enableNMEAMessage(UBX_NMEA_GLL, COM_PORT_UART1);
+
+                if (!nmea_config_ok) {
+                    error("GPS - Failed to enable one or more NMEA messages.");
+                    resp = false; // Update main resp
+                } else {
+                    debug("GPS - NMEA messages enabled successfully.");
+                }
+            }
+
+            if (resp) {
+                debug("GPS - Default configuration applied successfully.");
+            } else {
+                error("GPS - Failed to apply default configuration.");
+            }
+        } else {
+            debug("GPS - Skipping default configuration due to earlier initialization failure.");
         }
-        // Enable required NMEA messages
-        resp &= myGNSS.enableNMEAMessage(UBX_NMEA_GGA, COM_PORT_UART1);
-        resp &= myGNSS.enableNMEAMessage(UBX_NMEA_GSA, COM_PORT_UART1);
-        resp &= myGNSS.enableNMEAMessage(UBX_NMEA_GSV, COM_PORT_UART1);
-        resp &= myGNSS.enableNMEAMessage(UBX_NMEA_RMC, COM_PORT_UART1);
-        resp &= myGNSS.enableNMEAMessage(UBX_NMEA_GST, COM_PORT_UART1);
-        resp &= myGNSS.enableNMEAMessage(UBX_NMEA_GLL, COM_PORT_UART1);
-        resp &= myGNSS.enableNMEAMessage(UBX_NMEA_VTG, COM_PORT_UART1);
-        if (resp == false) {
-            error("GPS - Failed to enable NMEA.");
-        }
-        */
     }
 
     if (resp == false) {
@@ -118,17 +138,34 @@ static uint8_t buffer[buffer_size];
 int buffer_pos = 0; // Initialize buffer position
 
 void handler() {
-    // Check if there's data coming from the serial port
-    if (gpsConnected && udp_send_func != nullptr) {
-        while (GPSSerial.available() && buffer_pos < buffer_size - 1) {
-            char c               = GPSSerial.read();
-            buffer[buffer_pos++] = c;
-        }
-        if (buffer_pos > 0) {
+    if (!gpsConnected || udp_send_func == nullptr) {
+        return;
+    }
+
+    while (GPSSerial.available()) {
+        char c = GPSSerial.read();
+
+        if (buffer_pos < buffer_size) { // Check if buffer has space
+            buffer[buffer_pos++] = (uint8_t)c;
+        } else {
+            // Buffer is full, but no newline yet. Send what we have to avoid data loss.
+            // This case should ideally not be hit if NMEA sentences are shorter than buffer_size.
+            warnf("GPS handler: buffer full before newline, sending partial data. Size: %d", buffer_pos);
             udp_send_func(buffer, buffer_pos);
-            buffer_pos = 0; // Reset buffer after sending
+            buffer_pos = 0;       // Reset buffer
+            buffer[buffer_pos++] = (uint8_t)c; // Store current char in new buffer
+        }
+
+        if (c == '\\n') {
+            // End of an NMEA sentence (typically preceded by '\\r')
+            // Send the complete sentence
+            udp_send_func(buffer, buffer_pos);
+            buffer_pos = 0; // Reset buffer for the next sentence
         }
     }
+    // Note: If GPSSerial.available() is false and buffer_pos > 0 but no '\\n' was received,
+    // that partial data remains in the buffer until the next call to handler() 
+    // and more data arrives to complete the sentence or fill the buffer.
 }
 } // namespace gps
 

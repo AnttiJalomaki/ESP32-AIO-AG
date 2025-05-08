@@ -22,5 +22,12 @@ namespace imu {
         }
         return hw_interface.roll();
     }
+
+    float get_pitch() {
+        if (!hw_interface.pitch) {
+            return 0.0f;
+        }
+        return hw_interface.pitch();
+    }
 }
 
