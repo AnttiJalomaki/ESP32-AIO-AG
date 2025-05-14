@@ -7,7 +7,7 @@
 
 namespace gps_main {
 constexpr size_t test_bauds_len          = 4;
-constexpr int test_bauds[test_bauds_len] = {38400, 115200, 230400,460800};
+constexpr int test_bauds[test_bauds_len] = {460800, 230400, 115200, 38400};
 constexpr int selected_baud              = 460800;
 
 static bool gpsConnected = false;
@@ -29,7 +29,7 @@ bool init() {
         GPSSerial.end();
         GPSSerial.setRxBufferSize(1024 * 5);
         GPSSerial.begin(test_baud, SERIAL_8N1, MAIN_GPS_RX_PIN, MAIN_GPS_TX_PIN);
-        delay(200);
+        delay(500);
         if ((resp = mainGNSS.begin(GPSSerial, defaultMaxWait, false))) {
             break;
         }
@@ -114,7 +114,7 @@ void process_udp_message(const uint8_t *data, size_t len, const ip_address &sour
 }
 
 const size_t buffer_size = 256; // Set the buffer size for NMEA messages
-static uint8_t buffer[buffer_size];
+uint8_t buffer[buffer_size];
 int buffer_pos = 0; // Initialize buffer position
 
 void handler() {

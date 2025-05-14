@@ -22,7 +22,7 @@ void setup() {
 
   initializeEthernet();
   debug("Ethernet initialized");
-  initUDPLogging();
+  //initUDPLogging();
 
   hw::init();
   debug("Hardware initialized");

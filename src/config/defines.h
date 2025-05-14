@@ -7,7 +7,7 @@
 #define LOGSerial USBSerial
 
 #define GPSSerial Serial2
-#define GPSSerial2 Serial1
+#define GPSSerial2 Serial
 
 #define GPS_HEADING true
 

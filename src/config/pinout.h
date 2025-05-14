@@ -8,8 +8,8 @@
 #define MAIN_GPS_RX_PIN 1
 #define MAIN_GPS_TX_PIN 2
 
-#define HEADING_GPS_RX_PIN 44
-#define HEADING_GPS_TX_PIN 43
+#define HEADING_GPS_RX_PIN 43
+#define HEADING_GPS_TX_PIN 44
 
 #define STEER_BTN_PIN 12
 #define WORK_BTN_PIN 13
